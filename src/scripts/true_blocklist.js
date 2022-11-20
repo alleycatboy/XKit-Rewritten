@@ -12,30 +12,32 @@ const hiddenClass = 'xkit-true-blocklist-filtered';
 const reblogSelector = keyToCss('reblog');
 const gatherStatusElement = dom('span');
 const OFFICIAL_BLOCKLIST_STORAGE_KEY = 'true_blocklist.official_blocklist';
+let blockedCount;
 
 const gatherBlocks = async function (blogName) {
   // let resource = `/v2/blog/${blogName}/blocks`;
 
   // const { response } = await apiFetch(resource);
   // const { blockedTumblelogs } = response;
-  // const blockedBlockNames = blockedTumblelogs.map(({ name }) => name);
+  // const blockedBlogNames = blockedTumblelogs.map(({ name }) => name);
 
-  // return blockedBlockNames;
+  // return blockedBlogNames;
   
   let resource = `/v2/blog/${blogName}/blocks`;
-  const blockedBlockNames = [];
+  let blockedBlogNames = [];
   
   while (resource) {
     const { response } = await apiFetch(resource);
     const { blockedTumblelogs } = response;
-    blockedBlockNames.concat(blockedTumblelogs.map(({ name }) => name));  
-    gatherStatusElement.textContent = `Found ${blockedBlockNames.length} blocked blogs...`;
+    blockedBlogNames = blockedBlogNames.concat(blockedTumblelogs.map(({ name }) => name));
+    gatherStatusElement.textContent = `Found ${blockedCount + blockedBlogNames.length} blocked blogs...`;
     resource = response.links?.next?.href;
   }
 
-  console.log(blockedBlockNames);
-  gatherStatusElement.textContent = `Found ${blockedBlockNames.length} blocked blogs.`;
-  return blockedBlockNames;
+  console.log(blockedBlogNames);
+  blockedCount += blockedBlogNames.length;
+  gatherStatusElement.textContent = `Found ${blockedCount} blocked blogs.`;
+  return blockedBlogNames;
 };
 
 const processPosts = postElements => filterPostElements(postElements).forEach(async postElement => {
@@ -85,6 +87,7 @@ const modalConfirmButton = dom(
   { class: 'red' },
   {
     click () {
+      blockedCount = 0;
       gatherStatusElement.textContent = '';
       showModal(modalWorkingOptions);
       updateBlocks();
