@@ -59,6 +59,9 @@ const updateBlocks = async function () {
 
   await browser.storage.local.set({ [OFFICIAL_BLOCKLIST_STORAGE_KEY]: blockedBlogNames });
 
+  onNewPosts.removeListener(processPosts);
+  onNewPosts.addListener(processPosts);
+
   showModal({
     title: 'All done!',
     message: [
@@ -121,7 +124,10 @@ export const main = async function () {
 };
 
 export const clean = async function () {
+  $(`.${hiddenClass}`).removeClass(hiddenClass);
+  onNewPosts.removeListener(processPosts);
   removeSidebarItem(sidebarOptions.id);
+  await browser.storage.local.remove(OFFICIAL_BLOCKLIST_STORAGE_KEY);
 };
 
 export const stylesheet = true;
