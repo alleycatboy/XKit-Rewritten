@@ -7,6 +7,7 @@ import { dom } from '../util/dom.js';
 import { userBlogNames } from '../util/user.js';
 import { onNewPosts } from '../util/mutations.js';
 import { timelineObject } from '../util/react_props.js';
+import { getPreferences } from '../util/preferences.js';
 
 const hiddenClass = 'xkit-true-blocklist-filtered';
 const reblogSelector = keyToCss('reblog');
@@ -35,8 +36,8 @@ const processPosts = postElements => filterPostElements(postElements).forEach(as
   const { blog: { name }, trail, rebloggedFromName } = await timelineObject(postElement);
   const { [OFFICIAL_BLOCKLIST_STORAGE_KEY]: officialBlocklist = [] } = await browser.storage.local.get(OFFICIAL_BLOCKLIST_STORAGE_KEY);
 
-  const customBlocklist = [];
-  const blocklist = [...officialBlocklist, ...customBlocklist];
+  const { softBlocklist } = await getPreferences('true_blocklist');
+  const blocklist = [...officialBlocklist, ...(parseSoftBlocklist(softBlocklist))];
 
   if (blocklist.includes(name) || blocklist.includes(rebloggedFromName)) {
     postElement.classList.add(hiddenClass);
@@ -50,6 +51,10 @@ const processPosts = postElements => filterPostElements(postElements).forEach(as
     }
   });
 });
+
+const parseSoftBlocklist = softBlocklist => (
+  softBlocklist.split(',').map(blogName => blogName.trim())
+);
 
 const updateBlocks = async function () {
   gatherStatusElement.textContent = 'Gathering blocks...';
