@@ -26,7 +26,6 @@ const gatherBlocks = async function (blogName) {
     resource = response.links?.next?.href;
   }
 
-  console.log(blockedBlogNames);
   blockedCount += blockedBlogNames.length;
   gatherStatusElement.textContent = `Found ${blockedCount} blocked blogs.`;
   return blockedBlogNames;
@@ -34,8 +33,9 @@ const gatherBlocks = async function (blogName) {
 
 const processPosts = postElements => filterPostElements(postElements).forEach(async postElement => {
   const { blog: { name }, trail, rebloggedFromName } = await timelineObject(postElement);
-  console.log(timelineObject(postElement))
-  const { [OFFICIAL_BLOCKLIST_STORAGE_KEY]: officialBlocklist = [] } = await browser.storage.local.get(OFFICIAL_BLOCKLIST_STORAGE_KEY)
+  const { [OFFICIAL_BLOCKLIST_STORAGE_KEY]: officialBlocklist = [] } = await browser.storage.
+  
+  local.get(OFFICIAL_BLOCKLIST_STORAGE_KEY)
 
   const customBlocklist = [];
   const blocklist = [...officialBlocklist, ...customBlocklist];
