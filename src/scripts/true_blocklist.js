@@ -17,7 +17,7 @@ let blockedCount;
 const gatherBlocks = async function (blogName) {
   let resource = `/v2/blog/${blogName}/blocks`;
   let blockedBlogNames = [];
-  
+
   while (resource) {
     const { response } = await apiFetch(resource);
     const { blockedTumblelogs } = response;
@@ -33,9 +33,7 @@ const gatherBlocks = async function (blogName) {
 
 const processPosts = postElements => filterPostElements(postElements).forEach(async postElement => {
   const { blog: { name }, trail, rebloggedFromName } = await timelineObject(postElement);
-  const { [OFFICIAL_BLOCKLIST_STORAGE_KEY]: officialBlocklist = [] } = await browser.storage.
-  
-  local.get(OFFICIAL_BLOCKLIST_STORAGE_KEY)
+  const { [OFFICIAL_BLOCKLIST_STORAGE_KEY]: officialBlocklist = [] } = await browser.storage.local.get(OFFICIAL_BLOCKLIST_STORAGE_KEY);
 
   const customBlocklist = [];
   const blocklist = [...officialBlocklist, ...customBlocklist];
@@ -56,7 +54,7 @@ const processPosts = postElements => filterPostElements(postElements).forEach(as
 const updateBlocks = async function () {
   gatherStatusElement.textContent = 'Gathering blocks...';
   const blockedBlogNames = (await Promise.all(
-    userBlogNames.map(userBlogName => gatherBlocks(userBlogName))  
+    userBlogNames.map(userBlogName => gatherBlocks(userBlogName))
   )).flat();
 
   await browser.storage.local.set({ [OFFICIAL_BLOCKLIST_STORAGE_KEY]: blockedBlogNames });
@@ -64,7 +62,7 @@ const updateBlocks = async function () {
   showModal({
     title: 'All done!',
     message: [
-      `Truly blocked ${blockedCount} blogs!\n`,
+      `Truly blocked ${blockedCount} blogs!\n`
     ],
     buttons: [
       modalCompleteButton
@@ -76,7 +74,7 @@ const modalWorkingOptions = {
   title: 'Truly blocking your blocks...',
   message: [
     dom('small', null, null, ['Do not navigate away from this page, or the process will be interrupted.\n\n']),
-    gatherStatusElement,
+    gatherStatusElement
   ]
 };
 
