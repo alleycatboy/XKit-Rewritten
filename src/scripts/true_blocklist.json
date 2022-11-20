@@ -9,7 +9,7 @@
   "help": "https://github.com/AprilSylph/XKit-Rewritten/wiki/Features#true-blocklist",
   "preferences": {
     "softBlocklist": {
-      "label": "Hide these blogs without actually blocking them. (comma-separated)",
+      "label": "Soft blocklist: hide these blogs without actually blocking them. (comma-separated)",
       "type": "textarea",
       "default": ""
     }
