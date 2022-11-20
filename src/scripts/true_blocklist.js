@@ -81,7 +81,7 @@ const updateBlocks = async function () {
 const modalWorkingOptions = {
   title: 'Truly blocking your blocks...',
   message: [
-    dom('small', null, null, ['Do not navigate away from this page, or the process will be interrupted.\n\n']),
+    dom('small', null, null, ['Do not navigate away from this page, or the process will be interrupted.']),
     gatherStatusElement
   ]
 };
