@@ -1,27 +1,3 @@
-.xkit-true-blocklist-filtered figure:not([style]):not(:hover),
-.xkit-true-blocklist-filtered [role="application"]:not(:hover) {
-  position: relative;
-}
-
-.xkit-true-blocklist-filtered figure:not([style]):not(:hover)::after,
-.xkit-true-blocklist-filtered [role="application"]:not(:hover)::after {
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-
-  background-color: rgb(var(--white));
-  background-image: linear-gradient(rgba(var(--black), 0.07), rgba(var(--black), 0.07));
-  color: rgba(var(--black), 0.65);
-  object-fit: cover;
-}
-
 .xkit-true-blocklist-filtered {
   display: none;
 }
