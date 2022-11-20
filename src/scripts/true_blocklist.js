@@ -1,10 +1,10 @@
 import { addSidebarItem, removeSidebarItem } from '../util/sidebar.js';
 import { showModal, modalCancelButton, modalCompleteButton } from '../util/modals.js';
 import { keyToCss } from '../util/css_map.js';
-import { buildStyle, filterPostElements } from '../util/interface.js';
+import { filterPostElements } from '../util/interface.js';
 import { apiFetch } from '../util/tumblr_helpers.js';
 import { dom } from '../util/dom.js';
-import { primaryBlogName, userBlogNames } from '../util/user.js';
+import { userBlogNames } from '../util/user.js';
 import { onNewPosts } from '../util/mutations.js';
 import { timelineObject } from '../util/react_props.js';
 
@@ -63,15 +63,11 @@ const processPosts = postElements => filterPostElements(postElements).forEach(as
 
 const updateBlocks = async function () {
   gatherStatusElement.textContent = 'Gathering blocks...';
-  console.log(primaryBlogName);
-
   const blockedBlogNames = (await Promise.all(
     userBlogNames.map(userBlogName => gatherBlocks(userBlogName))  
   )).flat();
 
-  console.log(blockedBlogNames);
   await browser.storage.local.set({ [OFFICIAL_BLOCKLIST_STORAGE_KEY]: blockedBlogNames });
-  console.log(browser.storage.local.get(OFFICIAL_BLOCKLIST_STORAGE_KEY));
 };
 
 const modalWorkingOptions = {
