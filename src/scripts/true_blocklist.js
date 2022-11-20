@@ -15,14 +15,6 @@ const OFFICIAL_BLOCKLIST_STORAGE_KEY = 'true_blocklist.official_blocklist';
 let blockedCount;
 
 const gatherBlocks = async function (blogName) {
-  // let resource = `/v2/blog/${blogName}/blocks`;
-
-  // const { response } = await apiFetch(resource);
-  // const { blockedTumblelogs } = response;
-  // const blockedBlogNames = blockedTumblelogs.map(({ name }) => name);
-
-  // return blockedBlogNames;
-  
   let resource = `/v2/blog/${blogName}/blocks`;
   let blockedBlogNames = [];
   
@@ -128,10 +120,6 @@ const sidebarOptions = {
 export const main = async function () {
   onNewPosts.addListener(processPosts);
   addSidebarItem(sidebarOptions);
-
-  // const { [OFFICIAL_BLOCKLIST_STORAGE_KEY]: officialBlocklist = [] } = await browser.storage.local.get(OFFICIAL_BLOCKLIST_STORAGE_KEY)
-  // blockList = officialBlocklist;
-  // onNewPosts.addListener(processPosts);
 };
 
 export const clean = async function () {
