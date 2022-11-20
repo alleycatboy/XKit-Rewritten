@@ -68,6 +68,16 @@ const updateBlocks = async function () {
   )).flat();
 
   await browser.storage.local.set({ [OFFICIAL_BLOCKLIST_STORAGE_KEY]: blockedBlogNames });
+
+  showModal({
+    title: 'All done!',
+    message: [
+      `Truly blocked ${blockedCount} blogs!\n`,
+    ],
+    buttons: [
+      modalCompleteButton
+    ]
+  });
 };
 
 const modalWorkingOptions = {
