@@ -8,7 +8,7 @@ import { onNewPosts } from '../util/mutations.js';
 import { timelineObject } from '../util/react_props.js';
 import { getPreferences } from '../util/preferences.js';
 
-const hiddenClass = 'xkit-true-blocklist-filtered';
+const HIDDEN_CLASS = 'xkit-true-blocklist-filtered';
 const gatherStatusElement = dom('span');
 const OFFICIAL_BLOCKLIST_STORAGE_KEY = 'true_blocklist.official_blocklist';
 let blockedCount;
@@ -42,7 +42,7 @@ const processPosts = postElements => filterPostElements(postElements).forEach(as
   parseSoftBlocklist(softBlocklist).forEach(softBlockedBlogName => blocklist.add(softBlockedBlogName));
 
   if (blocklist.has(name) || blocklist.has(rebloggedFromName) || trail.some(({ blog: { name } }) => blocklist.has(name))) {
-    postElement.classList.add(hiddenClass);
+    postElement.classList.add(HIDDEN_CLASS);
   }
 });
 
@@ -129,7 +129,7 @@ export const main = async function () {
 };
 
 export const clean = async function () {
-  $(`.${hiddenClass}`).removeClass(hiddenClass);
+  $(`.${HIDDEN_CLASS}`).removeClass(HIDDEN_CLASS);
   onNewPosts.removeListener(processPosts);
   removeSidebarItem(sidebarOptions.id);
   await browser.storage.local.remove(OFFICIAL_BLOCKLIST_STORAGE_KEY);
