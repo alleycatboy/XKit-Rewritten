@@ -1,6 +1,5 @@
 import { addSidebarItem, removeSidebarItem } from '../util/sidebar.js';
 import { showModal, modalCancelButton, modalCompleteButton } from '../util/modals.js';
-import { keyToCss } from '../util/css_map.js';
 import { filterPostElements } from '../util/interface.js';
 import { apiFetch } from '../util/tumblr_helpers.js';
 import { dom } from '../util/dom.js';
@@ -10,46 +9,41 @@ import { timelineObject } from '../util/react_props.js';
 import { getPreferences } from '../util/preferences.js';
 
 const hiddenClass = 'xkit-true-blocklist-filtered';
-const reblogSelector = keyToCss('reblog');
 const gatherStatusElement = dom('span');
 const OFFICIAL_BLOCKLIST_STORAGE_KEY = 'true_blocklist.official_blocklist';
 let blockedCount;
 
 const gatherBlocks = async function (blogName) {
   let resource = `/v2/blog/${blogName}/blocks`;
-  let blockedBlogNames = [];
+  const blocklist = new Set();
 
   while (resource) {
     const { response } = await apiFetch(resource);
     const { blockedTumblelogs } = response;
-    blockedBlogNames = blockedBlogNames.concat(blockedTumblelogs.map(({ name }) => name));
-    gatherStatusElement.textContent = `Found ${blockedCount + blockedBlogNames.length} blocked blogs...`;
+
+    blockedTumblelogs.forEach(({ name }) => blocklist.add(name));
+
+    gatherStatusElement.textContent = `Found ${blockedCount + blocklist.size} blocked blogs...`;
     resource = response.links?.next?.href;
   }
 
-  blockedCount += blockedBlogNames.length;
+  blockedCount += blocklist.size;
   gatherStatusElement.textContent = `Found ${blockedCount} blocked blogs.`;
-  return blockedBlogNames;
+  return blocklist;
 };
 
 const processPosts = postElements => filterPostElements(postElements).forEach(async postElement => {
   const { blog: { name }, trail, rebloggedFromName } = await timelineObject(postElement);
-  const { [OFFICIAL_BLOCKLIST_STORAGE_KEY]: officialBlocklist = [] } = await browser.storage.local.get(OFFICIAL_BLOCKLIST_STORAGE_KEY);
 
+  // TODO: Move the fetching up to the top level and pass the data down.
+  const { [OFFICIAL_BLOCKLIST_STORAGE_KEY]: blocklist = new Set() } = await browser.storage.local.get(OFFICIAL_BLOCKLIST_STORAGE_KEY);
   const { softBlocklist } = await getPreferences('true_blocklist');
-  const blocklist = [...officialBlocklist, ...(parseSoftBlocklist(softBlocklist))];
 
-  if (blocklist.includes(name) || blocklist.includes(rebloggedFromName)) {
+  parseSoftBlocklist(softBlocklist).forEach(softBlockedBlogName => blocklist.add(softBlockedBlogName));
+
+  if (blocklist.has(name) || blocklist.has(rebloggedFromName) || trail.some(({ blog: { name } }) => blocklist.has(name))) {
     postElement.classList.add(hiddenClass);
-    return;
   }
-
-  const reblogs = postElement.querySelectorAll(reblogSelector);
-  trail.forEach((trailItem, i) => {
-    if (blocklist.includes(trailItem.blog?.name)) {
-      reblogs[i].classList.add(hiddenClass);
-    }
-  });
 });
 
 const parseSoftBlocklist = softBlocklist => (
@@ -58,12 +52,18 @@ const parseSoftBlocklist = softBlocklist => (
 
 const updateBlocks = async function () {
   gatherStatusElement.textContent = 'Gathering blocks...';
-  const blockedBlogNames = (await Promise.all(
+  const blocklist = new Set();
+  const userBlocklists = await Promise.all(
     userBlogNames.map(userBlogName => gatherBlocks(userBlogName))
-  )).flat();
+  );
 
-  await browser.storage.local.set({ [OFFICIAL_BLOCKLIST_STORAGE_KEY]: blockedBlogNames });
+  userBlocklists.forEach(userBlocklist => {
+    userBlocklist.forEach(blockedBlogName => blocklist.add(blockedBlogName));
+  });
 
+  await browser.storage.local.set({ [OFFICIAL_BLOCKLIST_STORAGE_KEY]: blocklist });
+
+  // TODO: Refresher should be a separate function.
   onNewPosts.removeListener(processPosts);
   onNewPosts.addListener(processPosts);
 
