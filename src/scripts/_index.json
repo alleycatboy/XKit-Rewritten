@@ -29,6 +29,7 @@
   "timeformat",
   "timestamps",
   "trim_reblogs",
+  "true_blocklist",
   "tweaks",
   "vanilla_audio",
   "vanilla_video"
